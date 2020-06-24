@@ -1,0 +1,21 @@
+.textStyle {
+    font-weight: bold;
+    font-size: 35px;
+    color: rgb(255, 240, 254);
+}
+
+.headerBg {
+    background-color: rgb(40, 40, 40);
+}
+
+.formBg {
+    background-color: rgb(255, 255, 255);
+    width: 400px;
+    margin: auto;
+    display: block;
+    border-radius: 80px / 0px;
+}
+
+body {
+    background-color: rgb(71, 71, 71);
+}

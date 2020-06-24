@@ -12,24 +12,24 @@ const corsOptions = {
     credentials: true
   };
 
-  app.use(cors(corsOptions));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-
-  app.use("/member", require("./routes/memberRouter"));
-  app.use("/board", require("./routes/boardRouter"));
-
   app.use(
     session({
       resave: false,
       saveUninitialized: true,
-      secret: "hamletshu",
+      secret: "hansung",
       cookie: {
         httpOnly: true,
         secure: false
       }
     })
   );
+  
+  app.use(cors(corsOptions));
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
+  app.use("/member", require("./routes/memberRouter"));
+  app.use("/board", require("./routes/boardRouter"));
   
   app.listen(8080, () => {
     console.log("Server Start !!!");
