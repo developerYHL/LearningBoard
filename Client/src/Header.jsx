@@ -49,7 +49,9 @@ class Header extends Component {
     return (
       <div className="headerBg">
         <Navbar>
-        <div className="textStyle" href="/">한성컴퓨터</div>
+        <Navbar.Brand href="/">
+          <span className="textStyle">한성 장터</span>
+        </Navbar.Brand>
           <Navbar.Collapse className="justify-content-end">
             <NavLink to="/">
               <Button style={buttonStyle} variant="outline-warning">

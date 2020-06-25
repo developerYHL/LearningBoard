@@ -48,7 +48,7 @@ class LoginForm extends Component {
         const send_param = {
             headers,
             email: this.joinEmail.value,
-            name: this.joinName.value,
+            nickName: this.joinName.value,
             password: this.joinPw.value
         };
         axios.post("http://localhost:8080/member/join", send_param)
@@ -125,12 +125,12 @@ class LoginForm extends Component {
                     <Form.Text className="text-muted">
                         We'll never share your email with anyone else.
                     </Form.Text>
-                    <Form.Label>name</Form.Label>
+                    <Form.Label>nickname</Form.Label>
                     <Form.Control
                         type="text"
                         maxLength="20"
                         ref={ref => (this.joinName = ref)}
-                        placeholder="name"
+                        placeholder="nickName"
                     />
                     <Form.Label>Password</Form.Label>
                     <Form.Control

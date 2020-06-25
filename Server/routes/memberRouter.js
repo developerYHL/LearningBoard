@@ -36,7 +36,7 @@ router.post("/join", async (req, res) => {
                 buf.toString("base64");
                 obj = {
                   email: req.body.email,
-                  name: req.body.name,
+                  nickName: req.body.nickName,
                   password: key.toString("base64"),
                   salt: buf.toString("base64")
                 };
@@ -85,7 +85,6 @@ router.post("/login", async (req, res) => {
                 console.log(user2);
                 if (user2) {
                   // 있으면 로그인 처리
-                  // console.log(req.body._id);
                   await User.updateOne(
                     {
                       email: req.body.email
@@ -99,41 +98,16 @@ router.post("/login", async (req, res) => {
                     email: user2.email
                   });
                 } else {
-                  //없으면 로그인 실패횟수 추가
-                  if (user.loginCnt > 4) {
-                    res.json({
-                      message:
-                        "아이디나 패스워드가 5회 이상 일치하지 않아 잠겼습니다.\n고객센터에 문의 바랍니다."
-                    });
-                  } else {
-                    await User.updateOne(
-                      {
-                        email: req.body.email
-                      },
-                      { $set: { loginCnt: user.loginCnt + 1 } }
-                    );
-                    if (user.loginCnt >= 5) {
-                      await User.updateOne(
-                        {
-                          email: req.body.email
-                        },
-                        { $set: { lockYn: true } }
-                      );
-                      res.json({
-                        message:
-                          "아이디나 패스워드가 5회 이상 일치하지 않아 잠겼습니다.\n고객센터에 문의 바랍니다."
-                      });
-                    } else {
-                      res.json({
-                        message: "아이디나 패스워드가 일치하지 않습니다."
-                      });
-                    }
-                  }
+                  //없으면 로그인 실패
+                  res.json({
+                    message: "아이디나 패스워드가 일치하지 않습니다."
+                  });
                 }
               }
             }
           );
         } else {
+          //없으면 로그인 실패
           res.json({ message: "아이디나 패스워드가 일치하지 않습니다." });
         }
       }
