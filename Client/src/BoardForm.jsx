@@ -56,12 +56,10 @@ class BoardForm extends Component {
                     const boards = returnData.data.list;
                     boardList = boards.map(item => (
                         <BoardRow
-                            key={Date.now() + Math.random() * 500}
                             _id={item._id}
                             nickName={item.nickName}
                             createdAt={item.createdAt}
                             title={item.title}
-                            writer={item.writer}
                         ></BoardRow>
                     ));
                     this.setState({

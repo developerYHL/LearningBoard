@@ -3,6 +3,7 @@ const router = express.Router();
 const Board = require("../schemas/board");
 const User = require("../schemas/user");
 const board = require("../schemas/board");
+const { json } = require("express");
 
 router.post("/write", async (req, res) => {
     try {
@@ -28,7 +29,6 @@ router.post("/detail", async (req, res) => {
     try {
         const _id = req.body._id;
         const board = await Board.findOne({_id: _id });
-        console.log(board);
         res.json({ board });
     } catch (err) {
         console.log(err);
@@ -66,6 +66,56 @@ router.post("/getBoardList", async (req, res) => {
             sort: { createdAt: -1 }
         });
         res.json({ list: board });
+    } catch (err) {
+        console.log(err);
+        res.json({ message: false });
+    }
+});
+
+router.post("/addAssessmentCnt", async (req, res) => {
+    try {
+        let assesmentUsers = await Board.findOne({ _id: req.body._id});
+        if(assesmentUsers.assessmentUser.indexOf(req.body.writer) > -1){
+            res.json({message: "이미 추천 하셨습니다."});
+            return;
+        }
+
+        if (req.body.isLike) {
+            await Board.updateOne({ _id: req.body._id },
+                {
+                    $inc: {
+                        likeCnt: 1
+                    },
+                    $push: {
+                        assessmentUser: req.body.writer
+                    }
+                });
+            res.json({ isLike: true });
+        } else {
+            await Board.updateOne({ _id: req.body._id },
+                {
+                    $inc: {
+                        badCnt: 1
+                    },
+                    $push: {
+                        assessmentUser: req.body.writer
+                    }
+                });
+            res.json({ isLike: false });
+        }
+    } catch (err) {
+        console.log(err);
+        res.json({ message: false });
+    }
+});
+
+router.post("/getAssessmentCnt", async (req, res) => {
+    try {
+        let board = await Board.findOne({_id: req.body._id}, null);
+        res.json({
+            likeCnt: board.likeCnt,
+            badCnt: board.badCnt
+        });
     } catch (err) {
         console.log(err);
         res.json({ message: false });
