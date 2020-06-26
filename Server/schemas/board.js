@@ -8,6 +8,10 @@ const boardSchema = new Schema({
     required: true,
     ref: "User"
   },
+  nickName: {
+    type: String,
+    required: true
+  },
   title: {
     type: String,
     required: true

@@ -56,7 +56,6 @@ class BoardWriteForm extends Component {
         "title": boardTitle,
         "content": boardContent
       };
-
     }
 
     axios

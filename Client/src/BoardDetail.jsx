@@ -98,13 +98,14 @@ class BoardDetail extends Component {
                                         }
                                     }}
                                 >
-                                    <Button block style={marginBottom}>
+                                    <Button block style={marginBottom} variant="outline-warning">
                                         글 수정
                                     </Button>
                                 </NavLink>
                                 <Button
                                     block
                                     style={marginBottom}
+                                    variant="outline-warning"
                                     onClick={this.deleteBoard.bind(
                                         null,
                                         this.props.location.query._id
@@ -122,13 +123,11 @@ class BoardDetail extends Component {
                     alert("글 상세 조회 실패");
                 }
             })
-            //에러
             .catch(err => {
                 console.log(err);
             });
     };
 
-    //onClick={this.getBoard.bind(null,this.props._id)}
     render() {
         const divStyle = {
             margin: 50
