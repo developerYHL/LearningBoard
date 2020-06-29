@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { Table, Button } from "react-bootstrap";
+import { Table, Button, Form } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 import $ from "jquery";
-import {} from "jquery.cookie";
+import { } from "jquery.cookie";
+import "./css/style.css";
 axios.defaults.withCredentials = true;
 const headers = { withCredentials: true };
 
@@ -51,11 +52,11 @@ class BoardDetail extends Component {
             .post("http://localhost:8080/board/addAssessmentCnt", send_param)
             .then(returnData => {
                 if (returnData.data) {
-                    if(returnData.data.message){
+                    if (returnData.data.message) {
                         alert(returnData.data.message);
                     }
-                    else{
-                        if(returnData.data.isLike) {
+                    else {
+                        if (returnData.data.isLike) {
                             this.setState({
                                 likeCnt: this.state.likeCnt + 1
                             });
@@ -82,7 +83,7 @@ class BoardDetail extends Component {
         axios
             .post("http://localhost:8080/board/getAssessmentCnt", send_param)
             .then(returnData => {
-                if(returnData.data) {
+                if (returnData.data) {
                     this.setState({
                         likeCnt: returnData.data.likeCnt,
                     });
@@ -124,6 +125,10 @@ class BoardDetail extends Component {
             });
     };
 
+    writeComment = () => {
+        
+    };
+
     render() {
         if (this.props.location.query === undefined)
             window.location.href = "/";
@@ -140,7 +145,8 @@ class BoardDetail extends Component {
             margin: "10px",
             float: "right"
         }
-        return <div style={divStyle}>
+        return (
+        <div style={divStyle}>
             <div>
                 <Table striped bordered hover>
                     <thead>
@@ -205,10 +211,34 @@ class BoardDetail extends Component {
                         )}
                     >
                         글 삭제
-                                </Button>
+                    </Button>
                 </div>
             </div>
-        </div>;
+            <div>
+                    {/* 목록들을 List화 시켜서 나오게 해야함 */}
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th className="whiteFont">댓글</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <tr>
+                                <td colSpan="2" className="whiteFont">작성한 게시글이 존재하지 않습니다.</td>
+                            </tr>
+                    </tbody>
+                </Table>
+                    <Form.Control
+                        type="text"
+                        placeholder="댓글을 입력해주세요."
+                        ref={ref => (this.commentContent = ref)}
+                    />
+                    <Button style={buttonStyle} variant="outline-warning" onClick={this.writeComment}>
+                        저장하기
+                    </Button>
+            </div>
+        </div>
+        );
     }
 }
 

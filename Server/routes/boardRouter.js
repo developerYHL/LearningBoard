@@ -8,6 +8,7 @@ const { json } = require("express");
 router.post("/write", async (req, res) => {
     try {
         let user = await User.findOne({_id: req.body._id});
+        console.log("유저 id : " + user);
         let obj;
         obj = {
             writer: req.body._id,
@@ -15,6 +16,7 @@ router.post("/write", async (req, res) => {
             title: req.body.title,
             content: req.body.content
         };
+        console.log(obj);
 
         const board = new Board(obj);
         await board.save();
