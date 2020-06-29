@@ -11,6 +11,7 @@ const headers = { withCredentials: true };
 class BoardDetail extends Component {
     state = {
         board: {},
+        commentList: [],
         buttonDisplay: "none",
         likeCnt: 0,
         badCnt: 0
@@ -18,6 +19,7 @@ class BoardDetail extends Component {
 
     componentDidMount() {
         this.getDetail();
+        this.getCommentList();
     }
 
     deleteBoard = _id => {
@@ -125,8 +127,38 @@ class BoardDetail extends Component {
             });
     };
 
-    writeComment = () => {
-        
+    getCommentList = () => {
+        const send_param = {
+            headers
+        };
+        axios
+            .post("http://localhost:8080/comment/getCommentList", send_param)
+            .then(returnData => {
+                let commentList;
+                if (returnData.data.list.length > 0) {
+                    const comments = returnData.data.list;
+                    commentList = comments.map(item => (
+                        <tr>
+                            <td colSpan="2" className="whiteFont">{item.content}</td>
+                        </tr>
+                    ));
+                    this.setState({
+                        commentList: commentList
+                    });
+                } else {
+                    commentList = (
+                        <tr>
+                            <td colSpan="2" className="whiteFont">작성한 댓글이 존재하지 않습니다.</td>
+                        </tr>
+                    );
+                    this.setState({
+                        commentList: commentList
+                    });
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 
     render() {
@@ -223,9 +255,7 @@ class BoardDetail extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                            <tr>
-                                <td colSpan="2" className="whiteFont">작성한 게시글이 존재하지 않습니다.</td>
-                            </tr>
+                            {this.state.commentList}
                     </tbody>
                 </Table>
                     <Form.Control

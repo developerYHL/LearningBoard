@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Board = require("../schemas/board");
 const User = require("../schemas/user");
-const board = require("../schemas/board");
-const { json } = require("express");
 
 router.post("/write", async (req, res) => {
     try {
@@ -40,7 +38,7 @@ router.post("/detail", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     try{
-        await board.update({ _id: req.body._id }, {
+        await Board.update({ _id: req.body._id }, {
             $set: {
                 title: req.body.title,
                 content: req.body.content

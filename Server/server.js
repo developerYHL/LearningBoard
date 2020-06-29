@@ -30,6 +30,7 @@ const corsOptions = {
 
   app.use("/member", require("./routes/memberRouter"));
   app.use("/board", require("./routes/boardRouter"));
+  app.use("/comment", require("./routes/commentRouter"))
   
   app.listen(8080, () => {
     console.log("Server Start !!!");
