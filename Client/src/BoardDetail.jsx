@@ -129,7 +129,8 @@ class BoardDetail extends Component {
 
     getCommentList = () => {
         const send_param = {
-            headers
+            headers,
+            board: this.props.location.query._id
         };
         axios
             .post("http://localhost:8080/comment/getCommentList", send_param)
@@ -161,6 +162,42 @@ class BoardDetail extends Component {
             });
     };
 
+    writeComment = async() => {
+        if(this.commentContent.value === "") {
+            alert("댓글을 입력해주세요.")
+            this.commentContent.focus();
+            return;
+        }
+        const send_param = {
+            headers,
+            writer: $.cookie("login_id"),
+            board: this.props.location.query._id,
+            content: this.commentContent.value
+        };
+        await axios
+            .post("http://localhost:8080/comment/write", send_param)
+            .then(returnData => {
+                if (returnData.data.comment) {
+                    alert(this.state.commentList.length);
+                    let commentList = this.state.commentList;
+                    commentList.push(
+                        <tr>
+                            <td colSpan="2" className="whiteFont">{returnData.data.comment.content}</td>
+                        </tr>
+                    );
+                    alert(commentList);
+                    this.setState({
+                        commentList: commentList
+                    });
+                } else {
+                    alert(returnData.data.comment);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
     render() {
         if (this.props.location.query === undefined)
             window.location.href = "/";
@@ -178,86 +215,86 @@ class BoardDetail extends Component {
             float: "right"
         }
         return (
-        <div style={divStyle}>
-            <div>
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th className="whiteFont">
-                                {this.state.board.title}
-                                <Button
-                                    style={buttonStyle}
-                                    variant="outline-warning"
-                                    onClick={this.addAssessmentCnt.bind(
-                                        null,
-                                        this.props.location.query._id,
-                                        false
-                                    )}
-                                >싫어요 {this.state.badCnt}
-                                </Button>
-                                <Button
-                                    style={buttonStyle}
-                                    variant="outline-warning"
-                                    onClick={this.addAssessmentCnt.bind(
-                                        null,
-                                        this.props.location.query._id,
-                                        true
-                                    )}
-                                >좋아요 {this.state.likeCnt}
-                                </Button>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td className="whiteFont"
-                                dangerouslySetInnerHTML={{
-                                    __html: this.state.board.content
-                                }}
-                            ></td>
-                        </tr>
-                    </tbody>
-                </Table>
+            <div style={divStyle}>
                 <div>
-                    <NavLink
-                        to={{
-                            pathname: "/boardWrite",
-                            query: {
-                                title: this.state.board.title,
-                                content: this.state.board.content,
-                                _id: this.props.location.query._id
-                            }
-                        }}
-                    >
-                        <Button block style={marginBottom} variant="outline-warning">
-                            글 수정
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th className="whiteFont">
+                                    {this.state.board.title}
+                                    <Button
+                                        style={buttonStyle}
+                                        variant="outline-warning"
+                                        onClick={this.addAssessmentCnt.bind(
+                                            null,
+                                            this.props.location.query._id,
+                                            false
+                                        )}
+                                    >싫어요 {this.state.badCnt}
                                     </Button>
-                    </NavLink>
-                    <Button
-                        block
-                        style={marginBottom}
-                        variant="outline-warning"
-                        onClick={this.deleteBoard.bind(
-                            null,
-                            this.props.location.query._id
-                        )}
-                    >
-                        글 삭제
+                                    <Button
+                                        style={buttonStyle}
+                                        variant="outline-warning"
+                                        onClick={this.addAssessmentCnt.bind(
+                                            null,
+                                            this.props.location.query._id,
+                                            true
+                                        )}
+                                    >좋아요 {this.state.likeCnt}
+                                    </Button>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="whiteFont"
+                                    dangerouslySetInnerHTML={{
+                                        __html: this.state.board.content
+                                    }}
+                                ></td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                    <div>
+                        <NavLink
+                            to={{
+                                pathname: "/boardWrite",
+                                query: {
+                                    title: this.state.board.title,
+                                    content: this.state.board.content,
+                                    _id: this.props.location.query._id
+                                }
+                            }}
+                        >
+                            <Button block style={marginBottom} variant="outline-warning">
+                                글 수정
+                                    </Button>
+                        </NavLink>
+                        <Button
+                            block
+                            style={marginBottom}
+                            variant="outline-warning"
+                            onClick={this.deleteBoard.bind(
+                                null,
+                                this.props.location.query._id
+                            )}
+                        >
+                            글 삭제
                     </Button>
+                    </div>
                 </div>
-            </div>
-            <div>
+                <div>
                     {/* 목록들을 List화 시켜서 나오게 해야함 */}
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th className="whiteFont">댓글</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th className="whiteFont">댓글</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             {this.state.commentList}
-                    </tbody>
-                </Table>
+                        </tbody>
+                    </Table>
                     <Form.Control
                         type="text"
                         placeholder="댓글을 입력해주세요."
@@ -266,8 +303,8 @@ class BoardDetail extends Component {
                     <Button style={buttonStyle} variant="outline-warning" onClick={this.writeComment}>
                         저장하기
                     </Button>
+                </div>
             </div>
-        </div>
         );
     }
 }

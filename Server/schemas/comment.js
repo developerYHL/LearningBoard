@@ -16,6 +16,10 @@ const commentSchema = new Schema({
     nickName: {
         type: String,
         required: true
+    },
+    content: {
+        type: String,
+        required: true
     }
 });
 

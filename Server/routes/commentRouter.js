@@ -6,18 +6,19 @@ const User = require("../schemas/user");
 
 router.post("/write", async (req, res) => {
     try {
-        let user = await User.findOne({_id: req.body._id});
+        let user = await User.findOne({_id: req.body.writer});
         let obj;
         obj = {
-            writer: req.body._id,
-            board: req.body.boardId,
+            writer: req.body.writer,
+            board: req.body.board,
             nickName: user.nickName,
             content: req.body.content
         };
+        console.log(obj);
 
         const comment = new Comment(obj);
         await comment.save();
-        res.json({ message: "게시글이 업로드 되었습니다." });
+        res.json({ comment: comment });
     } catch (err) {
         console.log(err);
         res.json({ message: false });
@@ -49,7 +50,7 @@ router.post("/delete", async (req, res) => {
 
 router.post("/getCommentList", async (req, res) => {
     try {
-        let comment = await Comment.find(null, null, {
+        let comment = await Comment.find({board: req.body.board}, null, {
             sort: { createdAt: -1 }
         });
         res.json({ list: comment });
