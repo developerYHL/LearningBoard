@@ -23,10 +23,11 @@ class BoardDetail extends Component {
         this.getCommentList();
     }
 
-    commentFormatter = text => {
+    commentFormatter = (text, nickName) => {
         return (
             <tr>
-                <td colSpan="2" className="whiteFont">{text}</td>
+                <th colSpan="2" className="whiteFont">{text}</th>
+                <th colSpan="2" className="whiteFont">{nickName}</th>
             </tr>
         );
     };
@@ -148,7 +149,7 @@ class BoardDetail extends Component {
                 if (returnData.data.list.length > 0) {
                     const comments = returnData.data.list;
                     commentList = comments.map(item => (
-                        this.commentFormatter(item.content)
+                        this.commentFormatter(item.content, item.nickName)
                     ));
                     this.setState({
                         commentList: commentList,
@@ -188,7 +189,7 @@ class BoardDetail extends Component {
                         commentList = this.state.commentList;
                     }
                     commentList.push(
-                        this.commentFormatter(returnData.data.comment.content)
+                        this.commentFormatter(returnData.data.comment.content, returnData.data.comment.nickName)
                     );
                     this.setState({
                         commentList: commentList,
@@ -292,7 +293,8 @@ class BoardDetail extends Component {
                     <Table striped bordered hover>
                         <thead>
                             <tr>
-                                <th className="whiteFont">댓글</th>
+                                <th colSpan="2" width="400px" className="whiteFont">댓글</th>
+                                <th colSpan="2" className="whiteFont">작성자</th>
                             </tr>
                         </thead>
                         <tbody>

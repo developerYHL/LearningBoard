@@ -80,6 +80,11 @@ class BoardWriteForm extends Component {
   };
 
   render() {
+    if($.cookie("login_id") === undefined) {
+      alert("잘못된 접근입니다.");
+      window.location.href = "/";
+    }
+
     const divStyle = {
       margin: 50
     };
