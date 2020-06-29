@@ -14,13 +14,22 @@ class BoardDetail extends Component {
         commentList: [],
         buttonDisplay: "none",
         likeCnt: 0,
-        badCnt: 0
+        badCnt: 0,
+        isComment: false
     };
 
     componentDidMount() {
         this.getDetail();
         this.getCommentList();
     }
+
+    commentFormatter = text => {
+        return (
+            <tr>
+                <td colSpan="2" className="whiteFont">{text}</td>
+            </tr>
+        );
+    };
 
     deleteBoard = _id => {
         const send_param = {
@@ -103,7 +112,7 @@ class BoardDetail extends Component {
             .post("http://localhost:8080/board/detail", send_param)
             .then(returnData => {
                 if (returnData.data) {
-                    if ($.cookie("login_id") == returnData.data.board.writer) {
+                    if ($.cookie("login_id") === returnData.data.board.writer) {
                         this.setState({
                             buttonDisplay: "block"
                         });
@@ -139,21 +148,17 @@ class BoardDetail extends Component {
                 if (returnData.data.list.length > 0) {
                     const comments = returnData.data.list;
                     commentList = comments.map(item => (
-                        <tr>
-                            <td colSpan="2" className="whiteFont">{item.content}</td>
-                        </tr>
+                        this.commentFormatter(item.content)
                     ));
                     this.setState({
-                        commentList: commentList
+                        commentList: commentList,
+                        isComment: true
                     });
                 } else {
-                    commentList = (
-                        <tr>
-                            <td colSpan="2" className="whiteFont">작성한 댓글이 존재하지 않습니다.</td>
-                        </tr>
-                    );
+                    commentList = this.commentFormatter("작성한 댓글이 존재하지 않습니다.");
                     this.setState({
-                        commentList: commentList
+                        commentList: commentList,
+                        isComment: false
                     });
                 }
             })
@@ -174,23 +179,23 @@ class BoardDetail extends Component {
             board: this.props.location.query._id,
             content: this.commentContent.value
         };
-        await axios
+        axios
             .post("http://localhost:8080/comment/write", send_param)
             .then(returnData => {
                 if (returnData.data.comment) {
-                    alert(this.state.commentList.length);
-                    let commentList = this.state.commentList;
+                    let commentList = [];
+                    if (this.state.isComment) {
+                        commentList = this.state.commentList;
+                    }
                     commentList.push(
-                        <tr>
-                            <td colSpan="2" className="whiteFont">{returnData.data.comment.content}</td>
-                        </tr>
+                        this.commentFormatter(returnData.data.comment.content)
                     );
-                    alert(commentList);
                     this.setState({
-                        commentList: commentList
+                        commentList: commentList,
+                        isComment: true
                     });
                 } else {
-                    alert(returnData.data.comment);
+                    alert("댓글 실패");
                 }
             })
             .catch(err => {
@@ -284,7 +289,6 @@ class BoardDetail extends Component {
                     </div>
                 </div>
                 <div>
-                    {/* 목록들을 List화 시켜서 나오게 해야함 */}
                     <Table striped bordered hover>
                         <thead>
                             <tr>

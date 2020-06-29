@@ -14,7 +14,6 @@ router.post("/write", async (req, res) => {
             nickName: user.nickName,
             content: req.body.content
         };
-        console.log(obj);
 
         const comment = new Comment(obj);
         await comment.save();
