@@ -21,19 +21,60 @@ class BoardDetail extends Component {
 
     componentDidMount() {
         if (this.props.location.query !== undefined) {
-            this.getDetail();
-            this.getCommentList();
+            $.removeCookie("board_id");
+            $.cookie("board_id", this.props.location.query._id);
         }
-
+        this.getDetail();
+        this.getCommentList();
     }
 
-    commentFormatter = (text, nickName) => {
+    commentFormatter = (_id, text, nickName) => {
         return (
             <tr>
-                <th colSpan="2" className="whiteFont">{text}</th>
+                <th colSpan="2" className="whiteFont">{text}
+                    <div>
+                        <Button
+                            style={{ float: "right" }}
+                            variant="outline-warning"
+                            onClick={this.deleteBoard.bind(
+                                null,
+                                $.cookie("board_id")
+                            )}
+                        >삭제
+                    </Button>
+                        <Button
+                            style={{ float: "right" }}
+                            variant="outline-warning"
+                            onClick={this.deleteComment.bind(
+                                null,
+                                $.cookie("board_id")
+                            )}
+                        >수정
+                    </Button>
+                    </div>
+                </th>
                 <th colSpan="2" className="whiteFont">{nickName}</th>
             </tr>
         );
+    };
+
+    deleteComment = _id => {
+        const send_param = {
+            headers,
+            _id
+        };
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            axios
+                .post("http://localhost:8080/comment/delete", send_param)
+                .then(returnData => {
+                    alert("댓글이 삭제 되었습니다.");
+                    //window.location.href = "/";
+                })
+                .catch(err => {
+                    console.log(err);
+                    alert("댓글 삭제 실패");
+                });
+        }
     };
 
     deleteBoard = _id => {
@@ -93,7 +134,7 @@ class BoardDetail extends Component {
     getDetail = () => {
         const send_param = {
             headers,
-            _id: this.props.location.query._id
+            _id: $.cookie("board_id")
         };
 
         axios
@@ -144,7 +185,7 @@ class BoardDetail extends Component {
     getCommentList = () => {
         const send_param = {
             headers,
-            board: this.props.location.query._id
+            board: $.cookie("board_id")
         };
         axios
             .post("http://localhost:8080/comment/getCommentList", send_param)
@@ -153,7 +194,7 @@ class BoardDetail extends Component {
                 if (returnData.data.list.length > 0) {
                     const comments = returnData.data.list;
                     commentList = comments.map(item => (
-                        this.commentFormatter(item.content, item.nickName)
+                        this.commentFormatter(item._id, item.content, item.nickName)
                     ));
                     this.setState({
                         commentList: commentList,
@@ -172,7 +213,7 @@ class BoardDetail extends Component {
             });
     };
 
-    writeComment = async() => {
+    writeComment = () => {
         if(this.commentContent.value === "") {
             alert("댓글을 입력해주세요.")
             this.commentContent.focus();
@@ -181,7 +222,7 @@ class BoardDetail extends Component {
         const send_param = {
             headers,
             writer: $.cookie("login_id"),
-            board: this.props.location.query._id,
+            board: $.cookie("board_id"),
             content: this.commentContent.value
         };
         axios
@@ -193,7 +234,7 @@ class BoardDetail extends Component {
                         commentList = this.state.commentList;
                     }
                     commentList.push(
-                        this.commentFormatter(returnData.data.comment.content, returnData.data.comment.nickName)
+                        this.commentFormatter(returnData.data.comment._id, returnData.data.comment.content, returnData.data.comment.nickName)
                     );
                     this.setState({
                         commentList: commentList,
@@ -210,7 +251,7 @@ class BoardDetail extends Component {
     };
 
     render() {
-        if($.cookie("login_id") === undefined || this.props.location.query === undefined) {
+        if($.cookie("login_id") === undefined || $.cookie("board_id") === undefined) {
             return <Redirect to="/"/>
         }
 
@@ -239,7 +280,7 @@ class BoardDetail extends Component {
                                         variant="outline-warning"
                                         onClick={this.addAssessmentCnt.bind(
                                             null,
-                                            this.props.location.query._id,
+                                            $.cookie("board_id"),
                                             false
                                         )}
                                     >싫어요 {this.state.badCnt}
@@ -249,7 +290,7 @@ class BoardDetail extends Component {
                                         variant="outline-warning"
                                         onClick={this.addAssessmentCnt.bind(
                                             null,
-                                            this.props.location.query._id,
+                                            $.cookie("board_id"),
                                             true
                                         )}
                                     >좋아요 {this.state.likeCnt}
@@ -274,13 +315,13 @@ class BoardDetail extends Component {
                                 query: {
                                     title: this.state.board.title,
                                     content: this.state.board.content,
-                                    _id: this.props.location.query._id
+                                    _id: $.cookie("board_id")
                                 }
                             }}
                         >
                             <Button block style={marginBottom} variant="outline-warning">
                                 글 수정
-                                    </Button>
+                            </Button>
                         </NavLink>
                         <Button
                             block
@@ -288,11 +329,11 @@ class BoardDetail extends Component {
                             variant="outline-warning"
                             onClick={this.deleteBoard.bind(
                                 null,
-                                this.props.location.query._id
+                                $.cookie("board_id")
                             )}
                         >
                             글 삭제
-                    </Button>
+                        </Button>
                     </div>
                 </div>
                 <div>
