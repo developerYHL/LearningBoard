@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Redirect } from 'react-router-dom';
 import CKEditor from "ckeditor4-react";
 import { Button, Form} from "react-bootstrap";
 import axios from "axios";
@@ -81,8 +82,7 @@ class BoardWriteForm extends Component {
 
   render() {
     if($.cookie("login_id") === undefined) {
-      alert("잘못된 접근입니다.");
-      window.location.href = "/";
+      return <Redirect to="/"/>
     }
 
     const divStyle = {

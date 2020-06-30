@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Table, Button, Form } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import axios from "axios";
 import $ from "jquery";
 import { } from "jquery.cookie";
@@ -15,12 +15,16 @@ class BoardDetail extends Component {
         buttonDisplay: "none",
         likeCnt: 0,
         badCnt: 0,
-        isComment: false
+        isComment: false,
+        defaultValue:""
     };
 
     componentDidMount() {
-        this.getDetail();
-        this.getCommentList();
+        if (this.props.location.query !== undefined) {
+            this.getDetail();
+            this.getCommentList();
+        }
+
     }
 
     commentFormatter = (text, nickName) => {
@@ -195,6 +199,7 @@ class BoardDetail extends Component {
                         commentList: commentList,
                         isComment: true
                     });
+                    this.commentContent.value = "";
                 } else {
                     alert("댓글 실패");
                 }
@@ -205,8 +210,9 @@ class BoardDetail extends Component {
     };
 
     render() {
-        if (this.props.location.query === undefined)
-            window.location.href = "/";
+        if($.cookie("login_id") === undefined || this.props.location.query === undefined) {
+            return <Redirect to="/"/>
+        }
 
         const divStyle = {
             margin: 50
