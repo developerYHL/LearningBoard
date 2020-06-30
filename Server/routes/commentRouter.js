@@ -4,6 +4,16 @@ const Comment = require("../schemas/comment");
 const Board = require("../schemas/board");
 const User = require("../schemas/user");
 
+router.post("/getComment", async (req, res) => {
+    try {
+        let comment = await Comment.findOne({_id: req.body._id});
+        res.json({ comment: comment });
+    } catch (err) {
+        console.log(err);
+        res.json({ message: false });
+    }
+});
+
 router.post("/write", async (req, res) => {
     try {
         let user = await User.findOne({_id: req.body.writer});
@@ -26,12 +36,12 @@ router.post("/write", async (req, res) => {
 
 router.post("/update", async (req, res) => {
     try{
-        await Comment.update({ _id: req.body._id }, {
+        await Comment.updateOne({ _id: req.body._id }, {
             $set: {
                 content: req.body.content
             }
         });
-        res.json({message: "댓글이 수정 되었습니다."});
+        res.json({ message: true });
     }catch(err) {
         console.log(err);
         res.json({ message: false });

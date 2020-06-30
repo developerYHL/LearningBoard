@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Table, Button, Form } from "react-bootstrap";
+import { Table, Button, Form, Modal } from "react-bootstrap";
 import { NavLink, Redirect } from "react-router-dom";
 import axios from "axios";
 import $ from "jquery";
@@ -16,46 +16,136 @@ class BoardDetail extends Component {
         likeCnt: 0,
         badCnt: 0,
         isComment: false,
-        defaultValue:""
+        isModalOpen: false,
+        update_Id: ""
+    };
+  
+    handleCloseModal = () => {
+      this.setState({ isModalOpen: false });
     };
 
     componentDidMount() {
         if (this.props.location.query !== undefined) {
             $.removeCookie("board_id");
-            $.cookie("board_id", this.props.location.query._id);
+            $.cookie("board_id", this.props.location.query._id, { expires: 1 });
         }
         this.getDetail();
         this.getCommentList();
     }
 
-    commentFormatter = (_id, text, nickName) => {
+    commentFormatter = (_id, writer, text, nickName) => {
+        let updateButtons = "";
+        if ($.cookie("login_id").indexOf(writer) > -1) {
+            updateButtons = (
+                <div>
+                    <Button
+                        style={{ float: "right" }}
+                        variant="outline-warning"
+                        onClick={this.deleteComment.bind(
+                            null,
+                            _id
+                        )}
+                    >삭제
+                        </Button>
+                    <Button
+                        style={{ float: "right" }}
+                        variant="outline-warning"
+                        onClick={this.updateComment.bind(
+                            null,
+                            _id
+                        )}
+                    >수정
+                        </Button>
+                </div>
+            )
+        }
+
         return (
             <tr>
                 <th colSpan="2" className="whiteFont">{text}
-                    <div>
-                        <Button
-                            style={{ float: "right" }}
-                            variant="outline-warning"
-                            onClick={this.deleteBoard.bind(
-                                null,
-                                $.cookie("board_id")
-                            )}
-                        >삭제
-                    </Button>
-                        <Button
-                            style={{ float: "right" }}
-                            variant="outline-warning"
-                            onClick={this.deleteComment.bind(
-                                null,
-                                $.cookie("board_id")
-                            )}
-                        >수정
-                    </Button>
-                    </div>
+                    {updateButtons}
                 </th>
                 <th colSpan="2" className="whiteFont">{nickName}</th>
             </tr>
         );
+    };
+
+    updateComment = _id => {
+        const send_param = {
+            headers,
+            _id
+        };
+        axios
+            .post("http://localhost:8080/comment/getComment", send_param)
+            .then(returnData => {
+                this.setState({
+                    isModalOpen: true,
+                    update_Id: returnData.data.comment._id
+                });
+                this.updateContent.value = returnData.data.comment.content
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
+    writeComment = _id => {
+        let url;
+        let send_param;
+        if(_id === null) {
+            if(this.commentContent.value === "") {
+                alert("댓글을 입력해주세요.")
+                this.commentContent.focus();
+                return;
+            }
+            url = "http://localhost:8080/comment/write";
+            send_param = {
+                headers,
+                writer: $.cookie("login_id"),
+                board: $.cookie("board_id"),
+                content: this.commentContent.value
+            };
+        } else {
+            if(this.updateContent.value === "") {
+                alert("댓글을 입력해주세요.")
+                this.updateContent.focus();
+                return;
+            }
+            url = "http://localhost:8080/comment/update";
+            send_param = {
+                headers,
+                _id: _id,
+                content: this.updateContent.value
+            };
+        }
+
+        axios
+            .post(url, send_param)
+            .then(returnData => {
+                if(returnData.data.message) {
+                    window.location.reload();
+                    return;
+                }
+                if (returnData.data.comment) {
+                    let commentList = [];
+                    if (this.state.isComment) {
+                        commentList = this.state.commentList;
+                    }
+                    commentList.push(
+                        this.commentFormatter(returnData.data.comment._id, returnData.data.comment.writer, returnData.data.comment.content, returnData.data.comment.nickName)
+                    );
+                    this.setState({
+                        commentList: commentList,
+                        isComment: true
+                    });
+                    this.commentContent.value = "";
+                } else {
+                    alert("댓글 실패");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
     };
 
     deleteComment = _id => {
@@ -68,7 +158,7 @@ class BoardDetail extends Component {
                 .post("http://localhost:8080/comment/delete", send_param)
                 .then(returnData => {
                     alert("댓글이 삭제 되었습니다.");
-                    //window.location.href = "/";
+                    window.location.reload();
                 })
                 .catch(err => {
                     console.log(err);
@@ -194,55 +284,18 @@ class BoardDetail extends Component {
                 if (returnData.data.list.length > 0) {
                     const comments = returnData.data.list;
                     commentList = comments.map(item => (
-                        this.commentFormatter(item._id, item.content, item.nickName)
+                        this.commentFormatter(item._id, item.writer, item.content, item.nickName)
                     ));
                     this.setState({
                         commentList: commentList,
                         isComment: true
                     });
                 } else {
-                    commentList = this.commentFormatter("작성한 댓글이 존재하지 않습니다.");
+                    commentList = this.commentFormatter(null, null, "작성된 댓글이 없습니다.", null);
                     this.setState({
                         commentList: commentList,
                         isComment: false
                     });
-                }
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    };
-
-    writeComment = () => {
-        if(this.commentContent.value === "") {
-            alert("댓글을 입력해주세요.")
-            this.commentContent.focus();
-            return;
-        }
-        const send_param = {
-            headers,
-            writer: $.cookie("login_id"),
-            board: $.cookie("board_id"),
-            content: this.commentContent.value
-        };
-        axios
-            .post("http://localhost:8080/comment/write", send_param)
-            .then(returnData => {
-                if (returnData.data.comment) {
-                    let commentList = [];
-                    if (this.state.isComment) {
-                        commentList = this.state.commentList;
-                    }
-                    commentList.push(
-                        this.commentFormatter(returnData.data.comment._id, returnData.data.comment.content, returnData.data.comment.nickName)
-                    );
-                    this.setState({
-                        commentList: commentList,
-                        isComment: true
-                    });
-                    this.commentContent.value = "";
-                } else {
-                    alert("댓글 실패");
                 }
             })
             .catch(err => {
@@ -353,9 +406,35 @@ class BoardDetail extends Component {
                         placeholder="댓글을 입력해주세요."
                         ref={ref => (this.commentContent = ref)}
                     />
-                    <Button style={buttonStyle} variant="outline-warning" onClick={this.writeComment}>
+                    <Button style={buttonStyle} variant="outline-warning" onClick={this.writeComment.bind(
+                                null,
+                                null
+                            )}>
                         저장하기
                     </Button>
+                    <Modal show={this.state.isModalOpen} onHide={this.handleCloseModal}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>댓글 수정</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form.Control
+                                type="text"
+                                placeholder="댓글을 입력해주세요."
+                                ref={ref => (this.updateContent = ref)}
+                            />
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={this.handleCloseModal}>
+                                닫기
+                            </Button>
+                            <Button variant="primary" onClick={this.writeComment.bind(
+                                null,
+                                this.state.update_Id
+                            )}>
+                                저장
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
                 </div>
             </div>
         );
