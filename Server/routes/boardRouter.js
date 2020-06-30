@@ -3,6 +3,8 @@ const router = express.Router();
 const Board = require("../schemas/board");
 const User = require("../schemas/user");
 
+const rangeList = 3;
+
 router.post("/write", async (req, res) => {
     try {
         let user = await User.findOne({_id: req.body._id});
@@ -62,10 +64,22 @@ router.post("/delete", async (req, res) => {
 
 router.post("/getBoardList", async (req, res) => {
     try {
+        let page = req.body.page;
         let board = await Board.find(null, null, {
             sort: { createdAt: -1 }
-        });
+        }).skip(((page-1)*3)).limit(3);
+        console.log(board);
         res.json({ list: board });
+    } catch (err) {
+        console.log(err);
+        res.json({ message: false });
+    }
+});
+
+router.get("/getLastPage", async (req, res) => {
+    try {
+        let board = await Board.count();
+        res.json({ count: Math.ceil(board/rangeList) });
     } catch (err) {
         console.log(err);
         res.json({ message: false });

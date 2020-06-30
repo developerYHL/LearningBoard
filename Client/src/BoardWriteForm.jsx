@@ -39,6 +39,7 @@ class BoardWriteForm extends Component {
       return;
     } else if (boardContent === undefined || boardContent === "") {
       alert("글 내용을 입력 해주세요.");
+      return;
     }
     
     if (this.props.location.query !== undefined) {
