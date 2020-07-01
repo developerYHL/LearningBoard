@@ -50,7 +50,7 @@ class Header extends Component {
       <div className="headerBg">
         <Navbar>
         <Navbar.Brand href="/">
-          <span className="textStyle">한성 장터</span>
+          <span className="textStyle">한성컴퓨터</span>
         </Navbar.Brand>
           <Navbar.Collapse className="justify-content-end">
             <NavLink to="/">

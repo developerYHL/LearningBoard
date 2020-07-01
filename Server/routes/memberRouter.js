@@ -5,15 +5,18 @@ const crypto = require("crypto");
 
 router.post("/join", async (req, res) => {
   try {
-    let obj = { email: req.body.email };
+    let findUserEmail = await User.findOne({ email: req.body.email });
+    let findNickName = await User.findOne({ nickName: req.body.nickName });
 
-    let user = await User.findOne(obj);
-    console.log(user);
-
-    if (user) {
+    if (findUserEmail) {
       res.json({
         message: "이메일이 중복되었습니다. 새로운 이메일을 입력해주세요.",
-        isOverlap: true
+        isEmail: true
+      });
+    } else if(findNickName) {
+      res.json({
+        message: "닉네임이 중복되었습니다. 새로운 닉네임을 입력해주세요.",
+        isNickName: true
       });
     } else {
       // 64바이트 길이의 salt를 생성
@@ -42,7 +45,7 @@ router.post("/join", async (req, res) => {
                 };
                 user = new User(obj);
                 await user.save();
-                res.json({ message: "회원가입 되었습니다!", isOverlap: false });
+                res.json({ message: "회원가입 되었습니다!" });
               }
             }
           );

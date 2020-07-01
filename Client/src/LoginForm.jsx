@@ -13,6 +13,8 @@ class LoginForm extends Component {
         const joinEmail = this.joinEmail.value;
         const joinName = this.joinName.value;
         const joinPw = this.joinPw.value;
+        const confirmPw = this.confirmPw.value;
+
         const regexEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
         const regexPw = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
         if (joinEmail === "" || joinEmail === undefined) {
@@ -31,7 +33,7 @@ class LoginForm extends Component {
             alert("이름을 입력해주세요.");
             this.joinName.focus();
             return;
-        } else if (joinPw === "" || joinPw === undefined) {
+        } else if (joinPw === "" || joinPw === undefined || confirmPw === "" || confirmPw === undefined) {
             alert("비밀번호를 입력해주세요.");
             this.joinPw.focus();
             return;
@@ -42,6 +44,10 @@ class LoginForm extends Component {
             alert("비밀번호를 숫자와 문자, 특수문자 포함 8~16자리로 입력해주세요.");
             this.joinPw.value = "";
             this.joinPw.focus();
+            return;
+        } else if (joinPw !== confirmPw) {
+            alert("비밀번호가 일치하지 않습니다.");
+            this.confirmPw.focus();
             return;
         }
 
@@ -55,9 +61,12 @@ class LoginForm extends Component {
             .then(returnData => {
                 if (returnData.data.message) {
                     alert(returnData.data.message);
-                    if (returnData.data.isOverlap) {
+                    if (returnData.data.isEmail) {
                         this.joinEmail.value = "";
                         this.joinEmail.focus();
+                    } else if(returnData.data.isNickName) {
+                        this.joinName.value = "";
+                        this.joinName.focus();
                     } else {
                         this.joinEmail.value = "";
                         this.joinName.value = "";
@@ -111,33 +120,42 @@ class LoginForm extends Component {
         const buttonStyle = {
             margin: "20px 0px 30px 0px"
         };
+        const formStyle = {
+            marginTop: "10px"
+        }
 
         return (
             <Form className="formBg">
                 <Form.Group className="formBg" controlId="joinForm">
-                    <Form.Label>Email address</Form.Label>
+                    <Form.Label>회원가입</Form.Label>
                     <Form.Control
+                        style={formStyle}
                         type="email"
                         maxLength="100"
                         ref={ref => (this.joinEmail = ref)}
-                        placeholder="Enter email"
+                        placeholder="이메일"
                     />
-                    <Form.Text className="text-muted">
-                        We'll never share your email with anyone else.
-                    </Form.Text>
-                    <Form.Label>nickname</Form.Label>
+                    <Form.Text className="text-muted"/>
                     <Form.Control
+                        style={formStyle}
                         type="text"
                         maxLength="20"
                         ref={ref => (this.joinName = ref)}
-                        placeholder="nickName"
+                        placeholder="닉네임"
                     />
-                    <Form.Label>Password</Form.Label>
                     <Form.Control
+                        style={formStyle}
                         type="password"
-                        maxLength="64"
+                        maxLength="16"
                         ref={ref => (this.joinPw = ref)}
-                        placeholder="Password"
+                        placeholder="비밀번호 (영문,숫자,특수문자 8-16자)"
+                    />
+                    <Form.Control
+                        style={formStyle}
+                        type="password"
+                        maxLength="16"
+                        ref={ref => (this.confirmPw = ref)}
+                        placeholder="비밀번호 확인"
                     />
                     <Button
                         style={buttonStyle}
