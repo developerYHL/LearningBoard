@@ -5,9 +5,6 @@ import $ from "jquery";
 import { } from "jquery.cookie";
 import "./css/style.css";
 
-axios.defaults.withCredentials = true;
-const headers = { withCredentials: true };
-
 class LoginForm extends Component {
     join = () => {
         const joinEmail = this.joinEmail.value;
@@ -17,6 +14,7 @@ class LoginForm extends Component {
 
         const regexEmail = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
         const regexPw = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,16}$/;
+
         if (joinEmail === "" || joinEmail === undefined) {
             alert("이메일 주소를 입력해주세요.");
             this.joinEmail.focus();
@@ -29,11 +27,16 @@ class LoginForm extends Component {
             this.joinEmail.value = "";
             this.joinEmail.focus();
             return;
-        } else if (joinName === "" || joinName === undefined) {
-            alert("이름을 입력해주세요.");
+        }
+
+        if (joinName === "" || joinName === undefined) {
+            alert("닉네임을 입력해주세요.");
             this.joinName.focus();
             return;
-        } else if (joinPw === "" || joinPw === undefined || confirmPw === "" || confirmPw === undefined) {
+        }
+
+        if (joinPw === "" || joinPw === undefined ||
+            confirmPw === "" || confirmPw === undefined) {
             alert("비밀번호를 입력해주세요.");
             this.joinPw.focus();
             return;
@@ -52,11 +55,11 @@ class LoginForm extends Component {
         }
 
         const send_param = {
-            headers,
             email: this.joinEmail.value,
             nickName: this.joinName.value,
             password: this.joinPw.value
         };
+
         axios.post("http://localhost:8080/member/join", send_param)
             .then(returnData => {
                 if (returnData.data.message) {
@@ -64,7 +67,7 @@ class LoginForm extends Component {
                     if (returnData.data.isEmail) {
                         this.joinEmail.value = "";
                         this.joinEmail.focus();
-                    } else if(returnData.data.isNickName) {
+                    } else if (returnData.data.isNickName) {
                         this.joinName.value = "";
                         this.joinName.focus();
                     } else {
@@ -73,14 +76,15 @@ class LoginForm extends Component {
                         this.joinPw.value = "";
                     }
                 } else {
-                    alert("회원가입 실패");
+                    alert("서버에 문제가 생겼습니다. 잠시후 시도해주세요.");
                 }
             })
-            //에러
             .catch(err => {
                 console.log(err);
+                alert("서버에 문제가 생겼습니다. 잠시후 시도해주세요.");
             });
     };
+
     login = () => {
         const loginEmail = this.loginEmail.value;
         const loginPw = this.loginPw.value;
@@ -96,27 +100,32 @@ class LoginForm extends Component {
         }
 
         const send_param = {
-            headers,
             email: this.loginEmail.value,
             password: this.loginPw.value
         };
+
         axios.post("http://localhost:8080/member/login", send_param)
             .then(returnData => {
-                if (returnData.data.message) {
-                    $.cookie("login_id", returnData.data._id, { expires: 1 });
-                    $.cookie("login_email", returnData.data.email, { expires: 1 });
-                    alert(returnData.data.message);
-                    window.location.reload();
+                if(returnData.data.message) {
+                    if (returnData.data._id && returnData.data.email) {
+                        $.cookie("login_id", returnData.data._id, { expires: 1 });
+                        $.cookie("login_email", returnData.data.email, { expires: 1 });
+                        alert(returnData.data.message);
+                        window.location.reload();
+                    } else {
+                        alert(returnData.data.message);
+                    }
                 } else {
-                    alert(returnData.data.message);
+                    alert("서버에 문제가 생겼습니다. 잠시후 시도해주세요.");
                 }
             })
             .catch(err => {
                 console.log(err);
+                alert("서버에 문제가 생겼습니다. 잠시후 시도해주세요.");
             });
     };
-    render() {
 
+    render() {
         const buttonStyle = {
             margin: "20px 0px 30px 0px"
         };
@@ -135,7 +144,7 @@ class LoginForm extends Component {
                         ref={ref => (this.joinEmail = ref)}
                         placeholder="이메일"
                     />
-                    <Form.Text className="text-muted"/>
+                    <Form.Text className="text-muted" />
                     <Form.Control
                         style={formStyle}
                         type="text"

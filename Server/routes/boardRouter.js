@@ -68,7 +68,6 @@ router.post("/getBoardList", async (req, res) => {
         let board = await Board.find(null, null, {
             sort: { createdAt: -1 }
         }).skip(((page-1)*3)).limit(3);
-        console.log(board);
         res.json({ list: board });
     } catch (err) {
         console.log(err);
@@ -78,7 +77,7 @@ router.post("/getBoardList", async (req, res) => {
 
 router.get("/getLastPage", async (req, res) => {
     try {
-        let board = await Board.count();
+        let board = await Board.countDocuments();
         res.json({ count: Math.ceil(board/rangeList) });
     } catch (err) {
         console.log(err);

@@ -8,23 +8,20 @@ import $ from "jquery";
 import {} from "jquery.cookie";
 
 class Body extends Component {
-  render() {
-    let resultForm;
-    function getResultForm() {
-      if ($.cookie("login_id")) {
-        resultForm = <Route exact path="/" component={BoardForm}></Route>;
-        return resultForm;
-      } else {
-        resultForm = <Route exact path="/" component={LoginForm}></Route>;
-        return resultForm;
-      }
+  getResultForm = () => {
+    if ($.cookie("login_id")) {
+      return <Route exact path="/" component={BoardForm}></Route>;
+    } else {
+      return <Route exact path="/" component={LoginForm}></Route>;
     }
-    getResultForm();
+  };
+  
+  render() {
     return (
       <div>
         <Route path="/boardWrite" component={BoardWriteForm}></Route>
         <Route path="/board/detail" component={BoardDetail}></Route>
-        {resultForm}
+        {this.getResultForm()}
       </div>
     );
   }

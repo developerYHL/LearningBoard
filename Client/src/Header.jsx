@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { Navbar, Button } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 import $ from "jquery";
 import {} from "jquery.cookie";
 import "./css/style.css";
 
-axios.defaults.withCredentials = true;
-const headers = { withCredentials: true };
+// axios.defaults.withCredentials = true;
+// const headers = { withCredentials: true };
 
 class Header extends Component {
   state = {
@@ -27,17 +27,23 @@ class Header extends Component {
   }
 
   logout = () => {
-    axios
-      .get("http://localhost:8080/member/logout", {
-        headers
-      })
-      .then(returnData => {
-        if (returnData.data.message) {
-          $.removeCookie("login_id");
-          alert("로그아웃 되었습니다!");
-          window.location.href = "/";
-        }
-      });
+    // axios
+    //   .get("http://localhost:8080/member/logout", {
+    //     headers
+    //   })
+    //   .then(returnData => {
+    //     if (returnData.data.message) {
+    //       $.removeCookie("login_id");
+    //       alert("로그아웃 되었습니다!");
+    //       window.location.href = "/";
+    //     } else {
+    //       alert("일시적인 오류가 발생하여 로그아웃하지 못했습니다!");
+    //       window.location.href = "/";
+    //     }
+    //   });
+    $.removeCookie("login_id");
+    alert("로그아웃 되었습니다!");
+    window.location.href = "/";
   };
 
   render() {
