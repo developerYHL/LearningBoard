@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Table, Button, Form, Modal } from "react-bootstrap";
 import { NavLink, Redirect } from "react-router-dom";
+import { WithContext as ReactTags } from 'react-tag-input';
 import axios from "axios";
 import $ from "jquery";
 import { } from "jquery.cookie";
@@ -8,20 +9,54 @@ import "./css/style.css";
 axios.defaults.withCredentials = true;
 const headers = { withCredentials: true };
 
+const KeyCodes = {
+    comma: 188,
+    enter: 13,
+  };
+
+const delimiters = [KeyCodes.comma, KeyCodes.enter];
+
 class BoardDetail extends Component {
     state = {
-        board: {},
-        commentList: [],
-        buttonDisplay: "none",
-        likeCnt: 0,
-        badCnt: 0,
-        isComment: false,
-        isModalOpen: false,
-        update_Id: ""
+        tags: [],
+        suggestions: [],
+         board: {},
+         commentList: [],
+         buttonDisplay: "none",
+         likeCnt: 0,
+         badCnt: 0,
+         isComment: false,
+         isModalOpen: false,
+         update_Id: ""
     };
-  
+
+    handleDelete = (i) => {
+        const { tags } = this.state;
+        this.setState({
+         tags: tags.filter((tag, index) => index !== i),
+        });
+    }
+
+    handleAddition = (tag) => {
+        const { suggestions } = this.state;
+        if(suggestions.indexOf(tag) > -1){
+            this.setState(state => ({ tags: [...state.tags, tag] }));
+        }
+    };
+
+    handleDrag = (tag, currPos, newPos) => {
+        const tags = [...this.state.tags];
+        const newTags = tags.slice();
+
+        newTags.splice(currPos, 1);
+        newTags.splice(newPos, 0, tag);
+
+        // re-render
+        this.setState({ tags: newTags });
+    }
+
     handleCloseModal = () => {
-      this.setState({ isModalOpen: false });
+        this.setState({ isModalOpen: false });
     };
 
     componentDidMount() {
@@ -281,12 +316,19 @@ class BoardDetail extends Component {
             .post("http://localhost:8080/comment/getCommentList", send_param)
             .then(returnData => {
                 let commentList;
+                let nickNameList = [];
+                let suggestions = [];
                 if (returnData.data.list.length > 0) {
                     const comments = returnData.data.list;
-                    commentList = comments.map(item => (
-                        this.commentFormatter(item._id, item.writer, item.content, item.nickName)
-                    ));
+                    commentList = comments.map(item => {
+                        nickNameList.push(item.nickName);
+                        return this.commentFormatter(item._id, item.writer, item.content, item.nickName);
+                    });
+                    suggestions = Array.from(new Set(nickNameList)).map((item, index) => {
+                        return {id: item, text: item}
+                    });
                     this.setState({
+                        suggestions: suggestions,
                         commentList: commentList,
                         isComment: true
                     });
@@ -320,6 +362,7 @@ class BoardDetail extends Component {
             margin: "10px",
             float: "right"
         }
+        const { tags, suggestions } = this.state;
         return (
             <div style={divStyle}>
                 <div>
@@ -412,6 +455,15 @@ class BoardDetail extends Component {
                             )}>
                         저장하기
                     </Button>
+                    <ReactTags
+                        placeholder="댓글을 입력해주세요."
+                        minQueryLength={1}
+                        tags={tags}
+                        suggestions={suggestions}
+                        handleDelete={this.handleDelete}
+                        handleAddition={this.handleAddition}
+                        handleDrag={this.handleDrag}
+                        delimiters={delimiters} />
                     <Modal show={this.state.isModalOpen} onHide={this.handleCloseModal}>
                         <Modal.Header closeButton>
                             <Modal.Title>댓글 수정</Modal.Title>
