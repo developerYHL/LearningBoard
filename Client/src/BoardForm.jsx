@@ -45,9 +45,6 @@ class BoardForm extends Component {
     }
 
     getBoardList = (page) => {
-        if(page === undefined)
-            page = 1;
-        
         const send_param = {
             headers,
             _id: $.cookie("login_id"),
