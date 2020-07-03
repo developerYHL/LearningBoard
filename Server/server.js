@@ -1,28 +1,24 @@
+const dotenv = require("dotenv");
+const path = require("path");
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const session = require("express-session");
 const dbConnect = require("./schemas/index");
+
+// environment variables setup
+dotenv.config({
+  path: path.resolve(
+    process.cwd(),
+    process.env.NODE_ENV == "production" ? ".env" : ".env.dev"
+  )
+});
 
 dbConnect();
 
-// 서버와 클라이언트가 서로 다른 포트를 사용함으로써 발생하는 이슈 해결
 const corsOptions = {
   origin: "http://localhost:3000",
   credentials: true
 };
-
-app.use(
-  session({
-    resave: false,
-    saveUninitialized: true,
-    secret: "hansung",
-    cookie: {
-      httpOnly: true,
-      secure: false
-    }
-  })
-);
 
 app.use(cors(corsOptions));
 app.use(express.json());

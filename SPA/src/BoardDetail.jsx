@@ -138,11 +138,13 @@ class BoardDetail extends Component {
         axios
             .post("http://localhost:8080/comment/getComment", send_param)
             .then(returnData => {
-                this.setState({
-                    isModalOpen: true,
-                    update_Id: returnData.data.comment._id
-                });
-                this.updateContent.value = returnData.data.comment.content
+                if(returnData.data.comment) {
+                    this.setState({
+                        isModalOpen: true,
+                        update_Id: returnData.data.comment._id
+                    });
+                    this.updateContent.value = returnData.data.comment.content
+                }
             })
             .catch(err => {
                 console.log(err);
@@ -192,7 +194,6 @@ class BoardDetail extends Component {
                         commentList = this.state.commentList;
                     }
 
-                    // 이 부분이 문제인듯
                     commentList.push(
                         this.commentFormatter(
                             returnData.data.comment._id, 
@@ -242,14 +243,12 @@ class BoardDetail extends Component {
         if (window.confirm("정말 삭제하시겠습니까?")) {
             axios
                 .post("http://localhost:8080/board/delete", send_param)
-                //정상 수행
                 .then(returnData => {
-                    alert("게시글이 삭제 되었습니다.");
+                    if(returnData.data.message)
+                    alert(returnData.data.message);
                     window.location.href = "/";
                 })
-                //에러
                 .catch(err => {
-                    console.log(err);
                     alert("글 삭제 실패");
                 });
         }

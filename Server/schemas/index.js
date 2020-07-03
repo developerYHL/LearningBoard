@@ -20,14 +20,18 @@ module.exports = () => {
       }
     );
   };
+
   connect();
+
   mongoose.connection.on("error", error => {
     console.log("DB connect error", error);
   });
+
   mongoose.connection.on("disconnected", () => {
     console.log("DB disconnected, Retry Connection");
     connect();
   });
+  
   require("./user");
   require("./board");
   require("./comment");
