@@ -6,13 +6,11 @@ import axios from "axios";
 import $ from "jquery";
 import { } from "jquery.cookie";
 import "./css/style.css";
-axios.defaults.withCredentials = true;
-const headers = { withCredentials: true };
 
 const KeyCodes = {
     comma: 188,
     enter: 13,
-  };
+};
 
 const delimiters = [KeyCodes.comma, KeyCodes.enter];
 
@@ -20,26 +18,26 @@ class BoardDetail extends Component {
     state = {
         tags: [],
         suggestions: [],
-         board: {},
-         commentList: [],
-         buttonDisplay: "none",
-         likeCnt: 0,
-         badCnt: 0,
-         isComment: false,
-         isModalOpen: false,
-         update_Id: ""
+        board: {},
+        commentList: [],
+        buttonDisplay: "none",
+        likeCnt: 0,
+        badCnt: 0,
+        isComment: false,
+        isModalOpen: false,
+        update_Id: ""
     };
 
     handleDelete = (i) => {
         const { tags } = this.state;
         this.setState({
-         tags: tags.filter((tag, index) => index !== i),
+            tags: tags.filter((tag, index) => index !== i),
         });
     }
 
     handleAddition = (tag) => {
         const { suggestions } = this.state;
-        if(suggestions.indexOf(tag) > -1){
+        if (suggestions.indexOf(tag) > -1) {
             this.setState(state => ({ tags: [...state.tags, tag] }));
         } else {
             this.writeComment(null, tag.text);
@@ -53,7 +51,6 @@ class BoardDetail extends Component {
         newTags.splice(currPos, 1);
         newTags.splice(newPos, 0, tag);
 
-        // re-render
         this.setState({ tags: newTags });
     }
 
@@ -74,7 +71,7 @@ class BoardDetail extends Component {
         let tagButtons = [];
         let updateButtons;
 
-        if(tag !== undefined) {
+        if (tag !== undefined) {
             for (const item of tag) {
                 tagButtons.push(
                     <span
@@ -108,7 +105,7 @@ class BoardDetail extends Component {
                     <Button
                         style={{ float: "right" }}
                         variant="outline-warning"
-                        onClick={this.updateComment.bind(
+                        onClick={this.getComment.bind(
                             null,
                             _id
                         )}
@@ -130,15 +127,14 @@ class BoardDetail extends Component {
         );
     };
 
-    updateComment = _id => {
+    getComment = _id => {
         const send_param = {
-            headers,
             _id
         };
         axios
             .post("http://localhost:8080/comment/getComment", send_param)
             .then(returnData => {
-                if(returnData.data.comment) {
+                if (returnData.data.comment) {
                     this.setState({
                         isModalOpen: true,
                         update_Id: returnData.data.comment._id
@@ -155,10 +151,9 @@ class BoardDetail extends Component {
         let url;
         let send_param;
         let tagName;
-        if(_id === null) {
+        if (_id === null) {
             url = "http://localhost:8080/comment/write";
             send_param = {
-                headers,
                 writer: $.cookie("login_id"),
                 board: $.cookie("board_id"),
                 content: text
@@ -166,16 +161,15 @@ class BoardDetail extends Component {
 
             tagName = this.state.tags.map(item => item.id);
             send_param.tag = tagName;
-            this.setState({tags: []})
+            this.setState({ tags: [] })
         } else {
-            if(this.updateContent.value === "") {
+            if (this.updateContent.value === "") {
                 alert("댓글을 입력해주세요.")
                 this.updateContent.focus();
                 return;
             }
             url = "http://localhost:8080/comment/update";
             send_param = {
-                headers,
                 _id: _id,
                 content: this.updateContent.value
             };
@@ -184,7 +178,7 @@ class BoardDetail extends Component {
         axios
             .post(url, send_param)
             .then(returnData => {
-                if(returnData.data.message) {
+                if (returnData.data.message) {
                     window.location.reload();
                     return;
                 }
@@ -196,9 +190,9 @@ class BoardDetail extends Component {
 
                     commentList.push(
                         this.commentFormatter(
-                            returnData.data.comment._id, 
-                            returnData.data.comment.writer, 
-                            returnData.data.comment.content, 
+                            returnData.data.comment._id,
+                            returnData.data.comment.writer,
+                            returnData.data.comment.content,
                             returnData.data.comment.nickName,
                             returnData.data.comment.tag)
                     );
@@ -218,7 +212,6 @@ class BoardDetail extends Component {
 
     deleteComment = _id => {
         const send_param = {
-            headers,
             _id
         };
         if (window.confirm("정말 삭제하시겠습니까?")) {
@@ -237,15 +230,14 @@ class BoardDetail extends Component {
 
     deleteBoard = _id => {
         const send_param = {
-            headers,
             _id
         };
         if (window.confirm("정말 삭제하시겠습니까?")) {
             axios
                 .post("http://localhost:8080/board/delete", send_param)
                 .then(returnData => {
-                    if(returnData.data.message)
-                    alert(returnData.data.message);
+                    if (returnData.data.message)
+                        alert(returnData.data.message);
                     window.location.href = "/";
                 })
                 .catch(err => {
@@ -256,7 +248,6 @@ class BoardDetail extends Component {
 
     addAssessmentCnt = (_id, isLike) => {
         const send_param = {
-            headers,
             _id,
             isLike,
             writer: $.cookie("login_id")
@@ -289,7 +280,6 @@ class BoardDetail extends Component {
 
     getDetail = () => {
         const send_param = {
-            headers,
             _id: $.cookie("board_id")
         };
 
@@ -340,7 +330,6 @@ class BoardDetail extends Component {
 
     getCommentList = () => {
         const send_param = {
-            headers,
             board: $.cookie("board_id")
         };
         axios
@@ -356,7 +345,7 @@ class BoardDetail extends Component {
                         return this.commentFormatter(item._id, item.writer, item.content, item.nickName, item.tag);
                     });
                     suggestions = Array.from(new Set(nickNameList)).map((item) => {
-                        return {id: item, text: item}
+                        return { id: item, text: item }
                     });
                     this.setState({
                         suggestions: suggestions,
@@ -377,13 +366,9 @@ class BoardDetail extends Component {
     };
 
     render() {
-        if($.cookie("login_id") === undefined || $.cookie("board_id") === undefined) {
-            return <Redirect to="/"/>
+        if ($.cookie("login_id") === undefined || $.cookie("board_id") === undefined) {
+            return <Redirect to="/" />
         }
-
-        const divStyle = {
-            margin: 50
-        };
         const marginBottom = {
             marginBottom: 5,
             display: this.state.buttonDisplay
@@ -393,9 +378,11 @@ class BoardDetail extends Component {
             margin: "10px",
             float: "right"
         }
+
         const { tags, suggestions } = this.state;
+
         return (
-            <div style={divStyle}>
+            <div style={{ margin: "50px" }}>
                 <div>
                     <Table striped bordered hover>
                         <thead>

@@ -1,12 +1,12 @@
 import React, { Component } from "react";
+import NotFoundPage from "./NotFoundPage";
+import { Route, Switch } from "react-router-dom";
 import LoginForm from "./LoginForm";
 import BoardForm from "./BoardForm";
 import BoardWriteForm from "./BoardWriteForm";
 import BoardDetail from "./BoardDetail";
-import NotFoundPage from "./NotFoundPage";
-import { Route, Switch } from "react-router-dom";
 import $ from "jquery";
-import {} from "jquery.cookie";
+import { } from "jquery.cookie";
 
 class Body extends Component {
   getResultForm = () => {
@@ -16,7 +16,7 @@ class Body extends Component {
       return <Route exact path="/" component={LoginForm}></Route>;
     }
   };
-  
+
   render() {
     return (
       <div>

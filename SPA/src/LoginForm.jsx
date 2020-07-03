@@ -106,7 +106,7 @@ class LoginForm extends Component {
 
         axios.post("http://localhost:8080/member/login", send_param)
             .then(returnData => {
-                if(returnData.data.message) {
+                if (returnData.data.message) {
                     if (returnData.data._id && returnData.data.email) {
                         $.cookie("login_id", returnData.data._id, { expires: 1 });
                         alert(returnData.data.message);

@@ -1,13 +1,9 @@
 import React, { Component } from "react";
 import { Navbar, Button } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
-// import axios from "axios";
+import { NavLink, Redirect } from "react-router-dom";
 import $ from "jquery";
-import {} from "jquery.cookie";
+import { } from "jquery.cookie";
 import "./css/style.css";
-
-// axios.defaults.withCredentials = true;
-// const headers = { withCredentials: true };
 
 class Header extends Component {
   state = {
@@ -27,9 +23,13 @@ class Header extends Component {
   }
 
   logout = () => {
-    $.removeCookie("login_id");
-    alert("로그아웃 되었습니다!");
-    window.location.href = "/";
+    if ($.cookie("login_id")) {
+      $.removeCookie("login_id");
+      alert("로그아웃 되었습니다!");
+      window.location.href = "/";
+    } else {
+      return <Redirect to="/" />
+    }
   };
 
   render() {
@@ -41,9 +41,9 @@ class Header extends Component {
     return (
       <div className="headerBg">
         <Navbar>
-        <Navbar.Brand href="/">
-          <span className="textStyle">한성컴퓨터</span>
-        </Navbar.Brand>
+          <Navbar.Brand href="/">
+            <span className="textStyle">한성 R{"&"}D</span>
+          </Navbar.Brand>
           <Navbar.Collapse className="justify-content-end">
             <NavLink to="/">
               <Button style={buttonStyle} variant="outline-warning">

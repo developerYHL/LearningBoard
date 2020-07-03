@@ -4,8 +4,6 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 import $ from "jquery";
 import { } from "jquery.cookie";
-axios.defaults.withCredentials = true;
-const headers = { withCredentials: true };
 
 class BoardRow extends Component {
     render() {
@@ -46,7 +44,6 @@ class BoardForm extends Component {
 
     getBoardList = (page) => {
         const send_param = {
-            headers,
             _id: $.cookie("login_id"),
             page: page
         };
@@ -85,13 +82,13 @@ class BoardForm extends Component {
 
     getPageButton = () => {
         axios
-            .get("http://localhost:8080/board/getLastPage", headers)
+            .get("http://localhost:8080/board/getLastPage")
             .then(returnData => {
                 let pageButton = [];
                 for (let i = 1; i <= returnData.data.count; i++) {
                     pageButton.push(
                         <Button
-                            style={{margin: "5px"}}
+                            style={{ margin: "5px" }}
                             onClick={this.getBoardList.bind(
                                 null,
                                 i
@@ -99,7 +96,7 @@ class BoardForm extends Component {
                             variant="secondary"
                             type="button"
                         >
-                        {i}
+                            {i}
                         </Button>
                     );
                 }
@@ -113,13 +110,9 @@ class BoardForm extends Component {
     };
 
     render() {
-        const divStyle = {
-            margin: 50
-        };
-
         return (
             <div>
-                <div style={divStyle}>
+                <div style={{ margin: "50px" }}>
                     <Table striped bordered hover>
                         <thead>
                             <tr>
@@ -135,7 +128,6 @@ class BoardForm extends Component {
                             {this.state.pageButton}
                         </ButtonGroup>
                     </div>
-                    
                 </div>
             </div>
         );
