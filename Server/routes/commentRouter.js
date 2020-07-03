@@ -3,6 +3,7 @@ const router = express.Router();
 const Comment = require("../schemas/comment");
 const Board = require("../schemas/board");
 const User = require("../schemas/user");
+const { text } = require("express");
 
 router.post("/getComment", async (req, res) => {
     try {
@@ -22,7 +23,8 @@ router.post("/write", async (req, res) => {
             writer: req.body.writer,
             board: req.body.board,
             nickName: user.nickName,
-            content: req.body.content
+            content: req.body.content,
+            tag: req.body.tag
         };
 
         const comment = new Comment(obj);

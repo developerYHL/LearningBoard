@@ -41,6 +41,8 @@ class BoardDetail extends Component {
         const { suggestions } = this.state;
         if(suggestions.indexOf(tag) > -1){
             this.setState(state => ({ tags: [...state.tags, tag] }));
+        } else {
+            this.writeComment(null, tag.text);
         }
     };
 
@@ -68,8 +70,29 @@ class BoardDetail extends Component {
         this.getCommentList();
     }
 
-    commentFormatter = (_id, writer, text, nickName) => {
-        let updateButtons = "";
+    commentFormatter = (_id, writer, text, nickName, tag) => {
+        let tagButtons = [];
+        let updateButtons;
+
+        if(tag !== undefined) {
+            for (const item of tag) {
+                tagButtons.push(
+                    <span
+                        style={{
+                            color: "#009900",
+                            border: "1px solid #ddd",
+                            background: "#eee",
+                            display: "inline-block",
+                            padding: "5px",
+                            margin: "0 5px",
+                            borderRadius: "2px"
+                        }}
+                    >{item}
+                    </span>
+                )
+            }
+        }
+
         if ($.cookie("login_id").indexOf(writer) > -1) {
             updateButtons = (
                 <div>
@@ -81,7 +104,7 @@ class BoardDetail extends Component {
                             _id
                         )}
                     >삭제
-                        </Button>
+                    </Button>
                     <Button
                         style={{ float: "right" }}
                         variant="outline-warning"
@@ -90,14 +113,16 @@ class BoardDetail extends Component {
                             _id
                         )}
                     >수정
-                        </Button>
+                    </Button>
                 </div>
             )
         }
 
         return (
             <tr>
-                <th colSpan="2" className="whiteFont">{text}
+                <th colSpan="2" className="whiteFont">
+                    {tagButtons}
+                    {text}
                     {updateButtons}
                 </th>
                 <th colSpan="2" className="whiteFont">{nickName}</th>
@@ -124,22 +149,22 @@ class BoardDetail extends Component {
             });
     };
 
-    writeComment = _id => {
+    writeComment = (_id, text) => {
         let url;
         let send_param;
+        let tagName;
+        let suggestions;
         if(_id === null) {
-            if(this.commentContent.value === "") {
-                alert("댓글을 입력해주세요.")
-                this.commentContent.focus();
-                return;
-            }
             url = "http://localhost:8080/comment/write";
             send_param = {
                 headers,
                 writer: $.cookie("login_id"),
                 board: $.cookie("board_id"),
-                content: this.commentContent.value
+                content: text
             };
+
+            tagName = this.state.tags.map(item => item.id);
+            send_param.tag = tagName;
         } else {
             if(this.updateContent.value === "") {
                 alert("댓글을 입력해주세요.")
@@ -166,8 +191,15 @@ class BoardDetail extends Component {
                     if (this.state.isComment) {
                         commentList = this.state.commentList;
                     }
+
+                    // 이 부분이 문제인듯
                     commentList.push(
-                        this.commentFormatter(returnData.data.comment._id, returnData.data.comment.writer, returnData.data.comment.content, returnData.data.comment.nickName)
+                        this.commentFormatter(
+                            returnData.data.comment._id, 
+                            returnData.data.comment.writer, 
+                            returnData.data.comment.content, 
+                            returnData.data.comment.nickName,
+                            returnData.data.comment.tag)
                     );
                     this.setState({
                         commentList: commentList,
@@ -322,9 +354,9 @@ class BoardDetail extends Component {
                     const comments = returnData.data.list;
                     commentList = comments.map(item => {
                         nickNameList.push(item.nickName);
-                        return this.commentFormatter(item._id, item.writer, item.content, item.nickName);
+                        return this.commentFormatter(item._id, item.writer, item.content, item.nickName, item.tag);
                     });
-                    suggestions = Array.from(new Set(nickNameList)).map((item, index) => {
+                    suggestions = Array.from(new Set(nickNameList)).map((item) => {
                         return {id: item, text: item}
                     });
                     this.setState({
@@ -333,7 +365,7 @@ class BoardDetail extends Component {
                         isComment: true
                     });
                 } else {
-                    commentList = this.commentFormatter(null, null, "작성된 댓글이 없습니다.", null);
+                    commentList = this.commentFormatter(null, null, "작성된 댓글이 없습니다.");
                     this.setState({
                         commentList: commentList,
                         isComment: false
@@ -444,17 +476,6 @@ class BoardDetail extends Component {
                             {this.state.commentList}
                         </tbody>
                     </Table>
-                    <Form.Control
-                        type="text"
-                        placeholder="댓글을 입력해주세요."
-                        ref={ref => (this.commentContent = ref)}
-                    />
-                    <Button style={buttonStyle} variant="outline-warning" onClick={this.writeComment.bind(
-                                null,
-                                null
-                            )}>
-                        저장하기
-                    </Button>
                     <ReactTags
                         placeholder="댓글을 입력해주세요."
                         minQueryLength={1}

@@ -20,7 +20,12 @@ const commentSchema = new Schema({
     content: {
         type: String,
         required: true
-    }
+    },
+    tag: [
+        {
+            type: String
+        }
+    ]
 });
 
 module.exports = mongoose.model("Comment", commentSchema);
