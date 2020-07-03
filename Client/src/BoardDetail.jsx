@@ -153,7 +153,6 @@ class BoardDetail extends Component {
         let url;
         let send_param;
         let tagName;
-        let suggestions;
         if(_id === null) {
             url = "http://localhost:8080/comment/write";
             send_param = {
@@ -165,6 +164,7 @@ class BoardDetail extends Component {
 
             tagName = this.state.tags.map(item => item.id);
             send_param.tag = tagName;
+            this.setState({tags: []})
         } else {
             if(this.updateContent.value === "") {
                 alert("댓글을 입력해주세요.")
