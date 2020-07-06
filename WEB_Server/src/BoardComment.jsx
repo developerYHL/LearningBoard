@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import { Table, Button, Form, Modal } from "react-bootstrap";
 import { WithContext as ReactTags } from 'react-tag-input';
 import axios from "axios";
-import $ from "jquery";
-import { } from "jquery.cookie";
 import "./css/style.css";
 
 const KeyCodes = {
