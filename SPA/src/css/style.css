@@ -79,3 +79,12 @@ body {
 .whiteFont {
     color: rgb(223, 223, 223);
 }
+.tagStyle {
+    color: #009900;
+    border: 1px solid #ddd;
+    background: #eee;
+    display: inline-block;
+    padding: 5px;
+    margin: 0 5px;
+    border-radius: 2px;
+}

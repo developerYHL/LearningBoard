@@ -16,46 +16,16 @@ const delimiters = [KeyCodes.comma, KeyCodes.enter];
 
 class BoardDetail extends Component {
     state = {
+        board: {},
         tags: [],
         suggestions: [],
-        board: {},
         commentList: [],
+        update_Id: "",
+        boardWriter: "",
         likeCnt: 0,
         badCnt: 0,
         isComment: false,
-        isModalOpen: false,
-        update_Id: "",
-        boardWriter: ""
-    };
-
-    handleDelete = (i) => {
-        const { tags } = this.state;
-        this.setState({
-            tags: tags.filter((tag, index) => index !== i),
-        });
-    }
-
-    handleAddition = (tag) => {
-        const { suggestions } = this.state;
-        if (suggestions.indexOf(tag) > -1) {
-            this.setState(state => ({ tags: [...state.tags, tag] }));
-        } else {
-            this.writeComment(null, tag.text);
-        }
-    };
-
-    handleDrag = (tag, currPos, newPos) => {
-        const tags = [...this.state.tags];
-        const newTags = tags.slice();
-
-        newTags.splice(currPos, 1);
-        newTags.splice(newPos, 0, tag);
-
-        this.setState({ tags: newTags });
-    }
-
-    handleCloseModal = () => {
-        this.setState({ isModalOpen: false });
+        isModalOpen: false
     };
 
     componentDidMount() {
@@ -68,7 +38,7 @@ class BoardDetail extends Component {
     }
 
     boardStateButton = (writer) => {
-        if(writer === $.cookie("login_id")) {
+        if (writer === $.cookie("login_id")) {
             return (
                 <div>
                     <NavLink
@@ -100,6 +70,128 @@ class BoardDetail extends Component {
         }
     }
 
+    getDetail = () => {
+        const send_param = {
+            _id: $.cookie("board_id")
+        };
+
+        axios
+            .post("http://localhost:8080/board/getAssessmentCnt", send_param)
+            .then(returnData => {
+                if (returnData.data) {
+                    this.setState({
+                        likeCnt: returnData.data.likeCnt,
+                    });
+                    this.setState({
+                        badCnt: returnData.data.badCnt,
+                    });
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                alert("글 추천 실패");
+            });
+
+        axios
+            .post("http://localhost:8080/board/detail", send_param)
+            .then(returnData => {
+                if (returnData.data) {
+                    this.setState({
+                        boardWriter: returnData.data.board.writer,
+                        board: {
+                            title: returnData.data.board.title,
+                            content: returnData.data.board.content
+                        }
+                    });
+                } else {
+                    alert("글 상세 조회 실패");
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
+    deleteBoard = _id => {
+        const send_param = {
+            _id
+        };
+        if (window.confirm("정말 삭제하시겠습니까?")) {
+            axios
+                .post("http://localhost:8080/board/delete", send_param)
+                .then(returnData => {
+                    if (returnData.data.message)
+                        alert(returnData.data.message);
+
+                    window.location.href = "/";
+                })
+                .catch(err => {
+                    alert("글 삭제 실패");
+                });
+        }
+    };
+
+    addAssessmentCnt = (_id, isLike) => {
+        const send_param = {
+            _id,
+            isLike,
+            writer: $.cookie("login_id")
+        };
+        axios
+            .post("http://localhost:8080/board/addAssessmentCnt", send_param)
+            .then(returnData => {
+                if (returnData.data) {
+                    if (returnData.data.message) {
+                        alert(returnData.data.message);
+                    }
+                    else {
+                        if (returnData.data.isLike) {
+                            this.setState({
+                                likeCnt: this.state.likeCnt + 1
+                            });
+                        } else {
+                            this.setState({
+                                badCnt: this.state.badCnt + 1
+                            });
+                        }
+                    }
+                }
+            })
+            .catch(err => {
+                alert("글 추천 실패");
+            });
+    };
+
+    handleDelete = (i) => {
+        const { tags } = this.state;
+        this.setState({
+            tags: tags.filter((tag, index) => index !== i),
+        });
+    }
+
+    handleAddition = (tag) => {
+        const { suggestions } = this.state;
+        if (suggestions.indexOf(tag) > -1) {
+            this.setState(state => ({ tags: [...state.tags, tag] }));
+        } else {
+            this.writeComment(null, tag.text);
+        }
+    };
+
+    handleDrag = (tag, currPos, newPos) => {
+        const tags = this.state.tags;
+        const newTags = tags.slice();
+
+        newTags.splice(currPos, 1);
+        newTags.splice(newPos, 0, tag);
+
+        this.setState({ tags: newTags });
+    }
+
+    handleCloseModal = () => {
+        this.setState({ isModalOpen: false });
+    };
+
     commentFormatter = (_id, writer, text, nickName, tag) => {
         let tagButtons = [];
         let updateButtons;
@@ -108,15 +200,7 @@ class BoardDetail extends Component {
             for (const item of tag) {
                 tagButtons.push(
                     <span
-                        style={{
-                            color: "#009900",
-                            border: "1px solid #ddd",
-                            background: "#eee",
-                            display: "inline-block",
-                            padding: "5px",
-                            margin: "0 5px",
-                            borderRadius: "2px"
-                        }}
+                        className={"tagStyle"}
                     >{item}
                     </span>
                 )
@@ -173,6 +257,43 @@ class BoardDetail extends Component {
                         update_Id: returnData.data.comment._id
                     });
                     this.updateContent.value = returnData.data.comment.content
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    };
+
+    getCommentList = () => {
+        const send_param = {
+            board: $.cookie("board_id")
+        };
+        axios
+            .post("http://localhost:8080/comment/getCommentList", send_param)
+            .then(returnData => {
+                let commentList;
+                let nickNameList = [];
+                let suggestions = [];
+                if (returnData.data.list.length > 0) {
+                    const comments = returnData.data.list;
+                    commentList = comments.map(item => {
+                        nickNameList.push(item.nickName);
+                        return this.commentFormatter(item._id, item.writer, item.content, item.nickName, item.tag);
+                    });
+                    suggestions = Array.from(new Set(nickNameList)).map((item) => {
+                        return { id: item, text: item }
+                    });
+                    this.setState({
+                        suggestions: suggestions,
+                        commentList: commentList,
+                        isComment: true
+                    });
+                } else {
+                    commentList = this.commentFormatter(null, null, "작성된 댓글이 없습니다.");
+                    this.setState({
+                        commentList: commentList,
+                        isComment: false
+                    });
                 }
             })
             .catch(err => {
@@ -259,146 +380,6 @@ class BoardDetail extends Component {
                     alert("댓글 삭제 실패");
                 });
         }
-    };
-
-    deleteBoard = _id => {
-        const send_param = {
-            _id
-        };
-        if (window.confirm("정말 삭제하시겠습니까?")) {
-            axios
-                .post("http://localhost:8080/board/delete", send_param)
-                .then(returnData => {
-                    if (returnData.data.message)
-                        alert(returnData.data.message);
-                    window.location.href = "/";
-                })
-                .catch(err => {
-                    alert("글 삭제 실패");
-                });
-        }
-    };
-
-    addAssessmentCnt = (_id, isLike) => {
-        const send_param = {
-            _id,
-            isLike,
-            writer: $.cookie("login_id")
-        };
-        axios
-            .post("http://localhost:8080/board/addAssessmentCnt", send_param)
-            .then(returnData => {
-                if (returnData.data) {
-                    if (returnData.data.message) {
-                        alert(returnData.data.message);
-                    }
-                    else {
-                        if (returnData.data.isLike) {
-                            this.setState({
-                                likeCnt: this.state.likeCnt + 1
-                            });
-                        } else {
-                            this.setState({
-                                badCnt: this.state.badCnt + 1
-                            });
-                        }
-                    }
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                alert("글 추천 실패");
-            });
-    };
-
-    getDetail = () => {
-        const send_param = {
-            _id: $.cookie("board_id")
-        };
-
-        axios
-            .post("http://localhost:8080/board/getAssessmentCnt", send_param)
-            .then(returnData => {
-                if (returnData.data) {
-                    this.setState({
-                        likeCnt: returnData.data.likeCnt,
-                    });
-                    this.setState({
-                        badCnt: returnData.data.badCnt,
-                    });
-                }
-            })
-            .catch(err => {
-                console.log(err);
-                alert("글 추천 실패");
-            });
-
-        axios
-            .post("http://localhost:8080/board/detail", send_param)
-            .then(returnData => {
-                if (returnData.data) {
-                    this.setState({
-                        boardWriter: returnData.data.board.writer
-                    });
-                    if ($.cookie("login_id") === returnData.data.board.writer) {
-                        this.setState({
-                            buttonDisplay: "block"
-                        });
-                    } else {
-                        this.setState({
-                            buttonDisplay: "none"
-                        });
-                    }
-                    this.setState({
-                        board: {
-                            title: returnData.data.board.title,
-                            content: returnData.data.board.content
-                        }
-                    });
-                } else {
-                    alert("글 상세 조회 실패");
-                }
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    };
-
-    getCommentList = () => {
-        const send_param = {
-            board: $.cookie("board_id")
-        };
-        axios
-            .post("http://localhost:8080/comment/getCommentList", send_param)
-            .then(returnData => {
-                let commentList;
-                let nickNameList = [];
-                let suggestions = [];
-                if (returnData.data.list.length > 0) {
-                    const comments = returnData.data.list;
-                    commentList = comments.map(item => {
-                        nickNameList.push(item.nickName);
-                        return this.commentFormatter(item._id, item.writer, item.content, item.nickName, item.tag);
-                    });
-                    suggestions = Array.from(new Set(nickNameList)).map((item) => {
-                        return { id: item, text: item }
-                    });
-                    this.setState({
-                        suggestions: suggestions,
-                        commentList: commentList,
-                        isComment: true
-                    });
-                } else {
-                    commentList = this.commentFormatter(null, null, "작성된 댓글이 없습니다.");
-                    this.setState({
-                        commentList: commentList,
-                        isComment: false
-                    });
-                }
-            })
-            .catch(err => {
-                console.log(err);
-            });
     };
 
     render() {
