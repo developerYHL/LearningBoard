@@ -74,6 +74,7 @@ class LoginForm extends Component {
                         this.joinEmail.value = "";
                         this.joinName.value = "";
                         this.joinPw.value = "";
+                        this.confirmPw.value = "";
                     }
                 } else {
                     alert("서버에 문제가 생겼습니다. 잠시후 시도해주세요.");
@@ -177,19 +178,20 @@ class LoginForm extends Component {
                 </Form.Group>
 
                 <Form.Group className="formBg" controlId="loginForm">
-                    <Form.Label>Email address</Form.Label>
+                    <Form.Label>로그인</Form.Label>
                     <Form.Control
+                        style={formStyle}
                         type="email"
                         maxLength="100"
                         ref={ref => (this.loginEmail = ref)}
-                        placeholder="Enter email"
+                        placeholder="이메일"
                     />
-                    <Form.Label>Password</Form.Label>
                     <Form.Control
+                        style={formStyle}
                         type="password"
                         maxLength="20"
                         ref={ref => (this.loginPw = ref)}
-                        placeholder="Password"
+                        placeholder="비밀번호"
                     />
                     <Button
                         style={buttonStyle}

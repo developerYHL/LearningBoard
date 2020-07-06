@@ -20,12 +20,12 @@ class BoardDetail extends Component {
         suggestions: [],
         board: {},
         commentList: [],
-        buttonDisplay: "none",
         likeCnt: 0,
         badCnt: 0,
         isComment: false,
         isModalOpen: false,
-        update_Id: ""
+        update_Id: "",
+        boardWriter: ""
     };
 
     handleDelete = (i) => {
@@ -67,6 +67,39 @@ class BoardDetail extends Component {
         this.getCommentList();
     }
 
+    boardStateButton = (writer) => {
+        if(writer === $.cookie("login_id")) {
+            return (
+                <div>
+                    <NavLink
+                        to={{
+                            pathname: "/boardWrite",
+                            query: {
+                                title: this.state.board.title,
+                                content: this.state.board.content,
+                                _id: $.cookie("board_id")
+                            }
+                        }}
+                    >
+                        <Button block variant="outline-warning">
+                            글 수정
+                                </Button>
+                    </NavLink>
+                    <Button
+                        block
+                        variant="outline-warning"
+                        onClick={this.deleteBoard.bind(
+                            null,
+                            $.cookie("board_id")
+                        )}
+                    >
+                        글 삭제
+                            </Button>
+                </div>
+            )
+        }
+    }
+
     commentFormatter = (_id, writer, text, nickName, tag) => {
         let tagButtons = [];
         let updateButtons;
@@ -90,7 +123,7 @@ class BoardDetail extends Component {
             }
         }
 
-        if ($.cookie("login_id").indexOf(writer) > -1) {
+        if ($.cookie("login_id") === writer) {
             updateButtons = (
                 <div>
                     <Button
@@ -304,6 +337,9 @@ class BoardDetail extends Component {
             .post("http://localhost:8080/board/detail", send_param)
             .then(returnData => {
                 if (returnData.data) {
+                    this.setState({
+                        boardWriter: returnData.data.board.writer
+                    });
                     if ($.cookie("login_id") === returnData.data.board.writer) {
                         this.setState({
                             buttonDisplay: "block"
@@ -369,10 +405,6 @@ class BoardDetail extends Component {
         if ($.cookie("login_id") === undefined || $.cookie("board_id") === undefined) {
             return <Redirect to="/" />
         }
-        const marginBottom = {
-            marginBottom: 5,
-            display: this.state.buttonDisplay
-        };
 
         const buttonStyle = {
             margin: "10px",
@@ -422,33 +454,7 @@ class BoardDetail extends Component {
                             </tr>
                         </tbody>
                     </Table>
-                    <div>
-                        <NavLink
-                            to={{
-                                pathname: "/boardWrite",
-                                query: {
-                                    title: this.state.board.title,
-                                    content: this.state.board.content,
-                                    _id: $.cookie("board_id")
-                                }
-                            }}
-                        >
-                            <Button block style={marginBottom} variant="outline-warning">
-                                글 수정
-                            </Button>
-                        </NavLink>
-                        <Button
-                            block
-                            style={marginBottom}
-                            variant="outline-warning"
-                            onClick={this.deleteBoard.bind(
-                                null,
-                                $.cookie("board_id")
-                            )}
-                        >
-                            글 삭제
-                        </Button>
-                    </div>
+                    {this.boardStateButton(this.state.boardWriter)}
                 </div>
                 <div>
                     <Table striped bordered hover>

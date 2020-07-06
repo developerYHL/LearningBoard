@@ -11,14 +11,14 @@ class BoardRow extends Component {
             <tr>
                 <td>
                     <NavLink
-                        to={{ pathname: "/board/detail", query: { _id: this.props._id } }}
+                        to={{ pathname: "/board/detail", query: { _id: this.props._id, writer: this.props.writer } }}
                     >
                         {this.props.createdAt.substring(0, 10)}
                     </NavLink>
                 </td>
                 <td>
                     <NavLink
-                        to={{ pathname: "/board/detail", query: { _id: this.props._id } }}
+                        to={{ pathname: "/board/detail", query: { _id: this.props._id, writer: this.props.writer } }}
                     >
                         {this.props.title}
                     </NavLink>
@@ -59,6 +59,7 @@ class BoardForm extends Component {
                             nickName={item.nickName}
                             createdAt={item.createdAt}
                             title={item.title}
+                            writer={item.writer}
                         ></BoardRow>
                     ));
                     this.setState({
