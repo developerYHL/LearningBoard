@@ -31,8 +31,4 @@ module.exports = () => {
     console.log("DB disconnected, Retry Connection");
     connect();
   });
-  
-  require("./user");
-  require("./board");
-  require("./comment");
 };
