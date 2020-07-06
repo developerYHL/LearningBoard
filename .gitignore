@@ -1,27 +1,27 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/Server/.env
-/Server/node_modules
-/SPA/node_modules
-/SPA/.pnp
-/SPA/.pnp.js
+/API_Server/.env
+/API_Server/node_modules
+/WEB_Server/node_modules
+/WEB_Server/.pnp
+/WEB_Server/.pnp.js
 
 # testing
-/SPA/coverage
+/WEB_Server/coverage
 
 # production
-/SPA/build
+/WEB_Server/build
 
 # misc
-/SPA/.DS_Store
-/SPA/.env.local
-/SPA/.env.development.local
-/SPA/.env.test.local
-/SPA/.env.production.local
+/WEB_Server/.DS_Store
+/WEB_Server/.env.local
+/WEB_Server/.env.development.local
+/WEB_Server/.env.test.local
+/WEB_Server/.env.production.local
 
-/SPA/npm-debug.log*
-/SPA/yarn-debug.log*
-/SPA/yarn-error.log*
+/WEB_Server/npm-debug.log*
+/WEB_Server/yarn-debug.log*
+/WEB_Server/yarn-error.log*
 
 /.vscode
