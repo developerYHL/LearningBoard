@@ -82,7 +82,7 @@ class BoardComment extends Component {
             _id
         };
         axios
-            .post("http://localhost:8080/comment/getComment", send_param)
+            .post("http://localhost:8080/comment/detail", send_param)
             .then(returnData => {
                 if (returnData.data.comment) {
                     this.setState({
