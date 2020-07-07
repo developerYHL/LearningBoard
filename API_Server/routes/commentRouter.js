@@ -22,6 +22,15 @@ router.post("/write", async (req, res) => {
     }
 });
 
+router.post("/detail", async (req, res) => {
+    try {
+        let comment = await Comment.findOne({ _id: req.body._id });
+        res.json({ comment: comment });
+    } catch (err) {
+        res.json({ message: false });
+    }
+});
+
 router.post("/update", async (req, res) => {
     try {
         await Comment.updateOne({ _id: req.body._id }, {
@@ -44,15 +53,6 @@ router.post("/delete", async (req, res) => {
         res.json({ message: false });
     }
 })
-
-router.post("/getComment", async (req, res) => {
-    try {
-        let comment = await Comment.findOne({ _id: req.body._id });
-        res.json({ comment: comment });
-    } catch (err) {
-        res.json({ message: false });
-    }
-});
 
 router.post("/getCommentList", async (req, res) => {
     try {

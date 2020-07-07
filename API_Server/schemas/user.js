@@ -23,14 +23,6 @@ const userSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  },
-  loginCnt: {
-    type: Number,
-    default: 0
-  },
-  lockYn: {
-    type: Boolean,
-    default: false
   }
 });
 

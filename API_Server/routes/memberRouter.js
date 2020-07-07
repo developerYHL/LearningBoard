@@ -59,7 +59,7 @@ router.post("/join", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    await User.findOne({ email: req.body.email }, async (err, user) => {
+    await User.findOne({ email: req.body.email }, (err, user) => {
       if (err) {
         console.log(err);
       } else {
@@ -70,7 +70,7 @@ router.post("/login", async (req, res) => {
             parseInt(process.env.iterations),
             parseInt(process.env.keyLength),
             process.env.digest,
-            async (err, key) => {
+            (err, key) => {
               if (err) {
                 console.log(err);
               } else {
