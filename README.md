@@ -11,7 +11,7 @@
 
 ## 화면흐름도
 
-![image.png](/wikis/2688454837414271762/files/2783243822000119981)
+![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/screenFlow.png)
 
 
 
@@ -310,10 +310,10 @@ ReactDOM.render(
 ```
 *  ReactDOM.render()안의 엘리먼트들은 루트 DOM 노드에서 렌더링 됨
 *  페이지를 Header, Body, Footer의 세 가지 영역으로 나눔
-   *  ![image.png](/wikis/2688454837414271762/files/2783361087590077360)
+   *  ![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page1.png)
 
 **참고자료**
-![image.png](/wikis/2688454837414271762/files/2783365990438155008)
-![image.png](/wikis/2688454837414271762/files/2783387273735336595)
-![image.png](/wikis/2688454837414271762/files/2783376921334123211)
+![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page2.png)
+![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page3.png)
+![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page4.png)
 
