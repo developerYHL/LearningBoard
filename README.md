@@ -21,6 +21,19 @@
 
 1. .env
    * 환경변수 파일
+    <details>
+    <summary></summary>
+    <div markdown="1">
+
+    |key|value|
+    |--|--|
+    |keyLength|64|
+    |encodingType|base64|
+    |iterations|101652|
+    |digest|sha512|
+
+    </div>
+    </details>
 2. node_modules
    * npm으로 Node.js dependency 추가 시 자동 생성되는 폴더
    * 프로젝트에 필요한 Node.js 모듈들이 저장되어있는 폴더
@@ -316,4 +329,3 @@ ReactDOM.render(
 ![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page2.png)
 ![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page3.png)
 ![image.png](https://github.com/developerYHL/LearningBoard/blob/master/README_Image/page4.png)
-
